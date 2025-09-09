@@ -26,7 +26,7 @@ jobs:
         run: |
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/test-ghpages-deploy/test-ghpages-deploy.github.io.git
           npx gh-pages --dist build --branch main --user "github-actions-bot <support+actions@github.com>"
+        shell: bash
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
         env:
-          DEST_VAR: ${{ vars.REPOSITORY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
