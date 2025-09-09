@@ -1,5 +1,6 @@
 # https://github.com/actions/starter-workflows/blob/main/pages/static.yml
 # https://github.com/tschaub/gh-pages
+# https://maxschmitt.me/posts/github-actions-ssh-key
 name: Deploy to GitHub Pages
 
 on:
@@ -29,12 +30,27 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
+      - name: Add SSH key
+        run: |
+                  mkdir -p /home/runner/.ssh
+                  ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
+                  echo "${ ACTIONS_DEPLOY_KEY }" > /home/runner/.ssh/github_actions
+                  chmod 600 /home/runner/.ssh/github_actions
+                  ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+                  ssh-add /home/runner/.ssh/github_actions
+        shell: bash
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Deploy to GitHub Pages
         id: deployment
         run: |
-          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/test-ghpages-deploy/test-ghpages-deploy.github.io.git
-          NODE_DEBUG=gh-pages npx gh-pages --dist build --branch main --user "github-actions-bot <support+actions@github.com>"
+          git remote set-url origin https://github.com/test-ghpages-deploy/test-ghpages-deploy.github.io.git
+          git config --global user.email "support+actions@github.com"
+          git config --global user.name "github-actions-bot"
+          NODE_DEBUG=gh-pages npx gh-pages --dist build --branch main
         shell: bash
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          
