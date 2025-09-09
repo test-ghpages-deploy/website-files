@@ -33,8 +33,9 @@ jobs:
         id: deployment
         run: |
           echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
-          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${DEST_VAR}.git
           npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>"
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
         env:
+          DEST_VAR: ${{ vars.REPOSITORY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
