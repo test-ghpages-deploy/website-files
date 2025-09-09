@@ -16,28 +16,16 @@ permissions:
   id-token: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest    
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
-      - name: Build the repo
-        run: |
-          pwd
-          ls -lha .
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         run: |
           pwd
-          ls -lha ../.
+          ls -lha .
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${DEST_VAR}.git
           npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>"
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
