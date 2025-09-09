@@ -41,6 +41,7 @@ jobs:
         shell: bash
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          # must in PEM format of OpenSSH format: ssh-keygen -p -f path/to/your/key -m pem
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Deploy to GitHub Pages
         id: deployment
