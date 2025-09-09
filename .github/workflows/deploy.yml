@@ -32,7 +32,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         run: |
-          ls -lha .
+          pwd
+          ls -lha ../.
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${DEST_VAR}.git
           npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>"
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
