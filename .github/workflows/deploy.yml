@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
+      - name: Build the repo
+        run: |
+          pwd
+          ls -lha .
 
   deploy:
     needs: build
