@@ -49,6 +49,5 @@ jobs:
         shell: bash
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           
