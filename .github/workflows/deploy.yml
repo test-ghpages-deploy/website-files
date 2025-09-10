@@ -66,7 +66,7 @@ jobs:
           # make sure both files use linux LF characters, not windows ones.
           # if you have a copy paste / clipboard utility or some other program it may mangle the contents.
           #
-          # did you somehow not get OPENSSH in the private key header? you don't have it in PEM format (make a backup of your key first):
+          # if you private key does not have `BEGIN OPENSSH PRIVATE KEY` in header you NEED to convert to PEM (make a backup of your key first):
           #   ssh-keygen -p -f path/to/your/key -m pem
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Deploy to GitHub Pages
