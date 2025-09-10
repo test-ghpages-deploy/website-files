@@ -52,17 +52,16 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
       - name: Set up SSH
-        # note: the printf here will insert a newline at the end of the deploy key, do NOT have one in the key in github.
         run: |
                   mkdir -p ~/.ssh
                   ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-                  # Preserve newlines in secret
+                  # Write deploy key (preserve newlines)
                   echo "${ACTIONS_DEPLOY_KEY}" > ~/.ssh/github_actions
                   chmod 600 ~/.ssh/github_actions
 
                   
-                  # Validate the key (safe check)
+                  # Validate the key
                   ssh-keygen -y -f ~/.ssh/github_actions > /dev/null || {
                     echo "❌ Invalid private key"; exit 1;
                   }
@@ -70,17 +69,21 @@ jobs:
                   # Start agent and add key
                   eval "$(ssh-agent -s)"
                   ssh-add ~/.ssh/github_actions
-        shell: bash
         env:          
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+      - name: Configure Git for SSH
+        run: |
+          git config --global user.email "support+actions@github.com"
+          git config --global user.name "github-actions-bot"
+
+          # notice github.com: not github.com/ for ssh url
+          git remote set-url origin git@github.com:test-ghpages-deploy/test-ghpages-deploy.github.io.git
+
+          git remote -v # Debug check: should show SSH URL
+      
       - name: Deploy to GitHub Pages
         id: deployment
         run: |
-          git remote set-url origin git@github.com/test-ghpages-deploy/test-ghpages-deploy.github.io.git
-          git config --global user.email "support+actions@github.com"
-          git config --global user.name "github-actions-bot"
-          git remote -v
           NODE_DEBUG=gh-pages npx gh-pages --dist build --branch main
-        shell: bash
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
           
