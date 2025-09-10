@@ -71,6 +71,9 @@ jobs:
                   ssh-add ~/.ssh/github_actions
         env:          
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+      - name: Debug key fingerprint
+        run: |
+          ssh-keygen -y -f ~/.ssh/github_actions | ssh-keygen -lf -
       - name: Configure Git for SSH
         run: |
           git config --global user.email "support+actions@github.com"
