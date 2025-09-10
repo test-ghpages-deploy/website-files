@@ -11,7 +11,8 @@
 #   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile -N ""
 # on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
 #   repo -> settings -> environments -> github-pages -> Environment secrets -> add ACTIONS_DEPLOY_KEY secret -> paste in contents
-# for this specific code, make sure there is NO trailing newline at the end of the key when you paste it in. You need one, but we will insert it in the command above as it often fails otherwise.
+# make sure there is a trailing newline at the end. It will fail otherwise.
+# also, if you use environment secret here, you need to use `environment: github-pages` below. Otherwise use a repository secret instead.
 # on the destination repo: add the file contents of the .pub file to deploy keys
 #   repo -> settings -> Security header -> Deploy keys -> Add deploy key -> check write access
 # make sure both files use linux LF characters, not windows ones.
