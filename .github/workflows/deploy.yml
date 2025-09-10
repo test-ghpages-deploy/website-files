@@ -51,36 +51,12 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
-      - name: Set up SSH
-        run: |
-                  mkdir -p ~/.ssh
-                  ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-                  # Write deploy key (preserve newlines)
-                  echo "${ACTIONS_DEPLOY_KEY}" > ~/.ssh/github_actions
-                  chmod 600 ~/.ssh/github_actions
-
-                  
-                  # Validate the key
-                  ssh-keygen -y -f ~/.ssh/github_actions > /dev/null || {
-                    echo "❌ Invalid private key"; exit 1;
-                  }
-
-                  # Start agent and add key
-                  eval "$(ssh-agent -s)"
-                  ssh-add ~/.ssh/github_actions
-        env:          
-          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-      - name: Show loaded SSH keys
-        run: |
-          ssh-add -l -E sha256
-        env:
-          SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
-      - name: Debug key fingerprint
-        run: |
-          ssh-keygen -y -f ~/.ssh/github_actions | ssh-keygen -lf -
-        env:
-          SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
+      - name: Start ssh-agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        
       - name: Configure Git for SSH
         run: |
           git config --global user.email "support+actions@github.com"
@@ -92,11 +68,13 @@ jobs:
           git remote -v # Debug check: should show SSH URL
         env:
           SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
+
       - name: Test SSH access
         run: |
           ssh -T git@github.com || true
         env:
           SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
+
       - name: Deploy to GitHub Pages
         id: deployment
         run: |
