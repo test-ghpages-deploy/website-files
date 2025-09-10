@@ -63,6 +63,7 @@ jobs:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_branch: main
           publish_dir: ./build
+          enable_jekyll: true
           external_repository: test-ghpages-deploy/test-ghpages-deploy.github.io
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
           
