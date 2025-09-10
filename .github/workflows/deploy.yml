@@ -36,15 +36,23 @@ jobs:
         # note: the printf here will insert a newline at the end of the deploy key, do NOT have one in the key in github.
         run: |
                   mkdir -p ~/.ssh
-                  ssh-keyscan github.com >> ~/.ssh/known_hosts                  
+                  ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+                  # Preserve newlines in secret
                   echo "${ACTIONS_DEPLOY_KEY}" > ~/.ssh/github_actions
                   chmod 600 ~/.ssh/github_actions
-                  ssh-keygen -l -f ~/.ssh/github_actions || echo "Invalid private key"
+
+                  
+                  # Validate the key (safe check)
+                  ssh-keygen -y -f ~/.ssh/github_actions > /dev/null || {
+                    echo "❌ Invalid private key"; exit 1;
+                  }
+
+                  # Start agent and add key
                   eval "$(ssh-agent -s)"
                   ssh-add ~/.ssh/github_actions
         shell: bash
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           # to create your key:
           #   ssh-keygen -t ed25519 -a 100 -f path/to/keyfile
           # make sure no passphrase, can't get prompted in github secret
@@ -58,7 +66,7 @@ jobs:
           # make sure both files use linux LF characters, not windows ones.
           # if you have a copy paste / clipboard utility or some other program it may mangle the contents.
           #
-          # do you need it in pem format? make a backup of your key first
+          # did you somehow not get OPENSSH in the private key header? you don't have it in PEM format (make a backup of your key first):
           #   ssh-keygen -p -f path/to/your/key -m pem
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Deploy to GitHub Pages
@@ -70,6 +78,4 @@ jobs:
           NODE_DEBUG=gh-pages npx gh-pages --dist build --branch main
         shell: bash
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           
