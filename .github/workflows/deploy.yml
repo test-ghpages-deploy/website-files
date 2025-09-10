@@ -79,6 +79,7 @@ jobs:
           git remote set-url origin git@github.com/test-ghpages-deploy/test-ghpages-deploy.github.io.git
           git config --global user.email "support+actions@github.com"
           git config --global user.name "github-actions-bot"
+          git remote -v
           NODE_DEBUG=gh-pages npx gh-pages --dist build --branch main
         shell: bash
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
