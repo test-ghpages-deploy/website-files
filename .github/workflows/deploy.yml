@@ -74,9 +74,13 @@ jobs:
       - name: Show loaded SSH keys
         run: |
           ssh-add -l -E sha256
+        env:
+          SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
       - name: Debug key fingerprint
         run: |
           ssh-keygen -y -f ~/.ssh/github_actions | ssh-keygen -lf -
+        env:
+          SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
       - name: Configure Git for SSH
         run: |
           git config --global user.email "support+actions@github.com"
@@ -86,12 +90,18 @@ jobs:
           git remote set-url origin git@github.com:test-ghpages-deploy/test-ghpages-deploy.github.io.git
 
           git remote -v # Debug check: should show SSH URL
+        env:
+          SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
       - name: Test SSH access
         run: |
           ssh -T git@github.com || true
+        env:
+          SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
       - name: Deploy to GitHub Pages
         id: deployment
         run: |
           NODE_DEBUG=gh-pages npx gh-pages --dist build --branch main
+        env:
+          SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
           
