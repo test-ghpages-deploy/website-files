@@ -1,23 +1,25 @@
 # refresh: 4
-# https://github.com/actions/starter-workflows/blob/main/pages/static.yml
-# https://github.com/tschaub/gh-pages
-# https://maxschmitt.me/posts/github-actions-ssh-key
 # https://github.com/webfactory/ssh-agent
+# https://github.com/tschaub/gh-pages
 
 # to create your key:
 #   ssh-keygen -t ed25519 -a 100 -f path/to/keyfile -N "" -C "github-actions"
 # make sure no passphrase, can't get prompted in github secret
+
 # if you need older rsa method for older servers:
 #   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile -N "" -C "github-actions"
-# on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
+
+# on the source repo: add the private key file contents without an extension to ACTIONS_DEPLOY_KEY secrets
 #   repo -> settings -> environments -> github-pages -> Environment secrets -> add ACTIONS_DEPLOY_KEY secret -> paste in contents
 # make sure there is a trailing newline at the end. It will fail otherwise.
 # also, if you use environment secret here, you need to use `environment: github-pages` below. Otherwise use a repository secret instead.
+
 # on the destination repo: add the file contents of the .pub file to deploy keys
 #   repo -> settings -> Security header -> Deploy keys -> Add deploy key -> check write access
+
 # make sure both files use linux LF characters, not windows ones.
 # if you have a copy paste / clipboard utility or some other program it may mangle the contents.
-#
+
 # if you private key does not have `BEGIN OPENSSH PRIVATE KEY` in header you NEED to convert to PEM (make a backup of your key first):
 #   ssh-keygen -p -f path/to/your/key -m pem
 
@@ -33,7 +35,7 @@ on:
 
 # Allow this job to clone the repo and create a page deployment
 permissions:
-  contents: read # fine because ssh deploy key will have the write at the destination 
+  contents: read # fine because ssh deploy key will have the write at the destination, write if deploying to same repo but different branch using `actions/deploy-pages` and `GITHUB_TOKEN` 
   # pages: write # since we are ssh pushing, don't need this
   # id-token: write # since we are ssh pushing, don't need this
 
@@ -62,14 +64,14 @@ jobs:
           git config --global user.email "support+actions@github.com"
           git config --global user.name "github-actions-bot"
 
-          # notice github.com: not github.com/ for ssh url
+          # notice `github.com:` not `github.com/` for ssh url unlike https urls
           git remote set-url origin git@github.com:test-ghpages-deploy/test-ghpages-deploy.github.io.git
 
           git remote -v # Debug check: should show SSH URL
 
       - name: Test SSH access
         run: |
-          ssh -T git@github.com || true
+          ssh -T git@github.com || true # Hi ...! You've successfully authenticated, but GitHub does not provide shell access.
 
       - name: Deploy to GitHub Pages
         id: deployment
