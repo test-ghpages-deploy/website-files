@@ -49,6 +49,7 @@ jobs:
           # if you need older rsa method for older servers:
           #   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile
           # on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
+          #   repo -> settings -> environments -> github-pages -> Environment secrets -> add ACTIONS_DEPLOY_KEY secret -> paste in contents
           # on the destination repo: add the file contents of the .pub file to deploy keys
           # both files NEED to be linux line endings and have a LF at the end (enter)
           #
