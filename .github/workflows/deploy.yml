@@ -80,7 +80,9 @@ jobs:
           git remote set-url origin git@github.com:test-ghpages-deploy/test-ghpages-deploy.github.io.git
 
           git remote -v # Debug check: should show SSH URL
-      
+      - name: Test SSH access
+        run: |
+          ssh -T git@github.com || true
       - name: Deploy to GitHub Pages
         id: deployment
         run: |
