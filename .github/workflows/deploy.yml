@@ -3,6 +3,23 @@
 # https://github.com/tschaub/gh-pages
 # https://maxschmitt.me/posts/github-actions-ssh-key
 # https://github.com/webfactory/ssh-agent
+
+# to create your key:
+#   ssh-keygen -t ed25519 -a 100 -f path/to/keyfile -N ""
+# make sure no passphrase, can't get prompted in github secret
+# if you need older rsa method for older servers:
+#   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile -N ""
+# on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
+#   repo -> settings -> environments -> github-pages -> Environment secrets -> add ACTIONS_DEPLOY_KEY secret -> paste in contents
+# for this specific code, make sure there is NO trailing newline at the end of the key when you paste it in. You need one, but we will insert it in the command above as it often fails otherwise.
+# on the destination repo: add the file contents of the .pub file to deploy keys
+#   repo -> settings -> Security header -> Deploy keys -> Add deploy key -> check write access
+# make sure both files use linux LF characters, not windows ones.
+# if you have a copy paste / clipboard utility or some other program it may mangle the contents.
+#
+# if you private key does not have `BEGIN OPENSSH PRIVATE KEY` in header you NEED to convert to PEM (make a backup of your key first):
+#   ssh-keygen -p -f path/to/your/key -m pem
+
 name: Deploy to GitHub Pages
 
 on:
@@ -52,22 +69,7 @@ jobs:
                   eval "$(ssh-agent -s)"
                   ssh-add ~/.ssh/github_actions
         shell: bash
-        env:
-          # to create your key:
-          #   ssh-keygen -t ed25519 -a 100 -f path/to/keyfile -N ""
-          # make sure no passphrase, can't get prompted in github secret
-          # if you need older rsa method for older servers:
-          #   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile -N ""
-          # on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
-          #   repo -> settings -> environments -> github-pages -> Environment secrets -> add ACTIONS_DEPLOY_KEY secret -> paste in contents
-          # for this specific code, make sure there is NO trailing newline at the end of the key when you paste it in. You need one, but we will insert it in the command above as it often fails otherwise.
-          # on the destination repo: add the file contents of the .pub file to deploy keys
-          #   repo -> settings -> Security header -> Deploy keys -> Add deploy key -> check write access
-          # make sure both files use linux LF characters, not windows ones.
-          # if you have a copy paste / clipboard utility or some other program it may mangle the contents.
-          #
-          # if you private key does not have `BEGIN OPENSSH PRIVATE KEY` in header you NEED to convert to PEM (make a backup of your key first):
-          #   ssh-keygen -p -f path/to/your/key -m pem
+        env:          
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Deploy to GitHub Pages
         id: deployment
