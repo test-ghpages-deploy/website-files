@@ -54,28 +54,15 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
 
-      - name: Start ssh-agent
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        
-      - name: Configure Git for SSH
-        run: |
-          git config --global user.email "support+actions@github.com"
-          git config --global user.name "github-actions-bot"
-
-          # notice `github.com:` not `github.com/` for ssh url unlike https urls
-          git remote set-url origin git@github.com:test-ghpages-deploy/test-ghpages-deploy.github.io.git
-
-          git remote -v # Debug check: should show SSH URL
-
-      - name: Test SSH access
-        run: |
-          ssh -T git@github.com || true # Hi ...! You've successfully authenticated, but GitHub does not provide shell access.
-
+      # - name: Build site
+          
       - name: Deploy to GitHub Pages
         id: deployment
-        run: |
-          NODE_DEBUG=gh-pages npx gh-pages --dist build --branch main
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_branch: main
+          publish_dir: ./build
+          external_repository: test-ghpages-deploy/test-ghpages-deploy.github.io
         if: ${{ github.ref == 'refs/heads/main' }} # only deploy main
           
