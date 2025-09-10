@@ -5,10 +5,10 @@
 # https://github.com/webfactory/ssh-agent
 
 # to create your key:
-#   ssh-keygen -t ed25519 -a 100 -f path/to/keyfile -N ""
+#   ssh-keygen -t ed25519 -a 100 -f path/to/keyfile -N "" -C "github-actions"
 # make sure no passphrase, can't get prompted in github secret
 # if you need older rsa method for older servers:
-#   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile -N ""
+#   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile -N "" -C "github-actions"
 # on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
 #   repo -> settings -> environments -> github-pages -> Environment secrets -> add ACTIONS_DEPLOY_KEY secret -> paste in contents
 # make sure there is a trailing newline at the end. It will fail otherwise.
