@@ -2,6 +2,7 @@
 # https://github.com/actions/starter-workflows/blob/main/pages/static.yml
 # https://github.com/tschaub/gh-pages
 # https://maxschmitt.me/posts/github-actions-ssh-key
+# https://github.com/webfactory/ssh-agent
 name: Deploy to GitHub Pages
 
 on:
@@ -42,7 +43,17 @@ jobs:
         shell: bash
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          # must in PEM format of OpenSSH format: ssh-keygen -p -f path/to/your/key -m pem
+          # to create your key:
+          #   ssh-keygen -t ed25519 -a 100 -f path/to/keyfile
+          # make sure no passphrase, can't get prompted in github secret
+          # if you need older rsa method for older servers:
+          #   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile
+          # on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
+          # on the destination repo: add the file contents of the .pub file to deploy keys
+          # both files NEED to be linux line endings and have a LF at the end (enter)
+          #
+          # do you need it in pem format? make a backup of your key first
+          #   ssh-keygen -p -f path/to/your/key -m pem
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Deploy to GitHub Pages
         id: deployment
