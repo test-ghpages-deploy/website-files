@@ -33,10 +33,11 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
       - name: Add SSH key
+        # note: the printf here will insert a newline at the end of the deploy key, do NOT have one in the key in github.
         run: |
                   mkdir -p ~/.ssh/
-                  ssh-keyscan github.com >> ~/.ssh/known_hosts
-                  echo "$ACTIONS_DEPLOY_KEY" > ~/.ssh/github_actions
+                  ssh-keyscan github.com >> ~/.ssh/known_hosts                  
+                  printf "%s\n" "$ACTIONS_DEPLOY_KEY" > ~/.ssh/github_actions                  
                   chmod 600 ~/.ssh/github_actions
                   ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
                   ssh-add ~/.ssh/github_actions
@@ -50,9 +51,10 @@ jobs:
           #   ssh-keygen -t rsa -b 4096 -o -f path/to/keyfile
           # on the source repo: add the file contents without an extension to ACTIONS_DEPLOY_KEY secrets
           #   repo -> settings -> environments -> github-pages -> Environment secrets -> add ACTIONS_DEPLOY_KEY secret -> paste in contents
+          # for this specific code, make sure there is NO trailing newline at the end of the key when you paste it in. You need one, but we will insert it in the command above as it often fails otherwise.
           # on the destination repo: add the file contents of the .pub file to deploy keys
           #   repo -> settings -> Security header -> Deploy keys -> Add deploy key -> check write access
-          # both files NEED to be linux line endings and have a LF at the end (enter), make sure you copy those in.
+          # make sure both files use linux LF characters, not windows ones.
           # if you have a copy paste / clipboard utility or some other program it may mangle the contents.
           #
           # do you need it in pem format? make a backup of your key first
